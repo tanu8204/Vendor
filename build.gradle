@@ -1,0 +1,51 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.3'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.SXN'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+	targetCompatibility = '17'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.2.4'
+
+	// Spring Boot Starter Web for creating RESTful APIs
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.projectlombok:lombok:1.18.28'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// Firebase Admin SDK for integrating with Firebase Realtime Database
+	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '9.2.0'
+
+	// Google OAuth Client Library for verifying Firebase ID Tokens
+	implementation group: 'com.google.api-client', name: 'google-api-client', version: '2.2.0'
+
+	annotationProcessor 'org.projectlombok:lombok:1.18.28'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '3.2.4'
+
+//	implementation group: 'com.github.fabiomaffioletti', name: 'spring-boot-starter-data-firebase', version: '1.0.0.RELEASE'
+
+	implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+
+	runtimeOnly 'com.h2database:h2'
+
+	implementation 'javax.servlet:javax.servlet-api:4.0.1' // Or the appropriate version for your project
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+

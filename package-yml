@@ -1,0 +1,38 @@
+version: '1.0'
+stages:
+  - prepare
+  - test
+  - package
+  - build
+
+steps:
+  main_clone:
+    title: Cloning main repository...
+    stage: prepare
+    type: git-clone
+    repo: 'tanu8204/Vendor'
+    revision: main
+    git: github
+
+  MyUnitTests:
+    title: Compile/Unit test
+    stage: test
+    image: gradle:jdk17
+    commands:
+      - gradle test --no-daemon --build-cache --gradle-user-home=/tanu8204/volume/.gradle -Dmaven.repo.local=/tanu8204/volume/m2
+
+  BuildMyJar:
+    title: Packaging Jar file
+    stage: package
+    image: gradle:jdk17
+    commands:
+      - gradle build --no-daemon --build-cache --gradle-user-home=/tanu8204/volume/.gradle -Dmaven.repo.local=/tanu8204/volume/m2
+
+  MyAppDockerImage:
+    title: Building Docker Image
+    type: build
+    stage: build
+    image_name: Vendor
+    working_directory: ./
+    tag: 'non-multi-stage'
+    dockerfile: Dockerfile

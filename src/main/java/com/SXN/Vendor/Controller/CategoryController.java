@@ -24,7 +24,9 @@ public class CategoryController {
 
     //checked - additems
    //http://localhost:8085/api/VendorList/addMenswear?outOfStock=false&name=T-shirt&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&itemId=12&vendorId=vendor&lockinPeriod=15&S=10&L=23&XL=3&XXL=0&M=1&subcategory=Kurtas&Category=Menswear
-   @PostMapping("addMenswear")
+   //dudes
+    //http://localhost:8085/api/VendorList/addMenswear?outOfStock=false&name=T-shirt&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&itemId=12&vendorId=vendor1&lockinPeriod=15&S=10&L=23&XL=3&XXL=0&M=1&subcategory=Shirts&Category=Menswear
+    @PostMapping("addMenswear")
     public ResponseEntity<ApiResponse<Map<String, Object>>> saveMensDetails(
             @RequestParam String vendorId,
             @RequestParam String Category,
@@ -140,7 +142,10 @@ public class CategoryController {
         }
     }
     //checked----
+    //https://vendor-1-vfyh.onrender.com/api/VendorList/getcatalogue?vendorId=vendor1
     //http://localhost:8085/api/VendorList/getcatalogue?vendorId=vendor
+    //dudes
+    //http://localhost:8085/api/VendorList/getcatalogue?vendorId=vendor1
     @GetMapping("getcatalogue")
     public ResponseEntity<ApiResponse<List<Map<String,Object>>>> getCatalogue(@RequestParam String vendorId) {
         try {
@@ -154,15 +159,21 @@ public class CategoryController {
 
     //delete product when stock == true ----------------------------checked
     //http://localhost:8085/api/VendorList/deleteOutOfStockItems?vendorId=vendor&Category=Womenswear&subcategory=Sarees&itemId=22
-    @DeleteMapping("deleteOutOfStockItems")
+    @PostMapping("deleteOutOfStockItems")
     public ResponseEntity<ApiResponse<String>> deleteOutOfStockItem(@RequestParam String vendorId,
                                                                     @RequestParam String Category,
                                                                     @RequestParam String subcategory,
                                                                     @RequestParam String itemId) {
         try {
-            categoryService.deleteOutOfStockItems(vendorId, Category, subcategory, itemId);
-            return ResponseEntity.ok(ResponseUtils.createOkResponse("ItemId " + itemId + " is deleted successfully from " + Category));
-        } catch (ExecutionException | InterruptedException e) {
+            // Check if item is out of stock before deletion
+            if (categoryService.isOutOfStock(vendorId, Category, subcategory, itemId)) {
+                categoryService.deleteOutOfStockItems(vendorId, Category, subcategory, itemId);
+                return ResponseEntity.ok(ResponseUtils.createOkResponse("ItemId " + itemId + " is deleted successfully from " + Category));
+            } else {
+                // Item is not out of stock, so don't delete
+                return ResponseEntity.ok(ResponseUtils.createOkResponse("Item with itemId: " + itemId + " is not out of stock, deletion skipped."));
+            }
+        }catch (ExecutionException | InterruptedException e) {
             e.printStackTrace(); // Handle the exception properly
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseUtils.createErrorResponse("Error occurred while deleting item with itemId: " + itemId));
@@ -171,7 +182,7 @@ public class CategoryController {
 
     //update Products -----------------------------------error
     //http://localhost:8085/api/VendorList/updateItem?vendorId=vendor&Category=Menswear&subcategory=Shirts&itemId=22&Description=12345qwert&price=0000&M=000&pictures=1,2
-    @PutMapping("updateItem")
+    @PostMapping("updateItem")
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateItem(
             @RequestParam String vendorId,
             @RequestParam String Category,
@@ -234,6 +245,8 @@ public class CategoryController {
 
     //checked
     //http://localhost:8085/api/VendorList/getitem?vendorId=vendor&itemId=w11
+    //duds
+    //http://localhost:8085/api/VendorList/getitem?vendorId=vendor1&itemId=tm22
     @GetMapping("getitem")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getItemDetailsByVendorId(
             @RequestParam String vendorId,

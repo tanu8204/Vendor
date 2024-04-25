@@ -126,14 +126,55 @@ public class CategoryServiceImpl implements CategoryService{
 
         // Iterate through the documents and add them to the catalogue list
         for (DocumentSnapshot document : querySnapshot) {
-            String itemId = document.getId();
+            Map<String, Object> getCatalogue = new HashMap<>();
+
+            // Add order ID to the pending order
+            getCatalogue.put("id", document.getId());
+
             Map<String, Object> itemDetails = document.getData();
-            Map<String, Object> item = new HashMap<>();
-            item.putAll(itemDetails);
-            catalogue.add(item);
+            // Get item detail map from document data
+            Map<String, Object> itemDetail = new HashMap<>();
+            itemDetail.putAll(itemDetails);
+
+
+            // Add item detail to the pending order
+            getCatalogue.putAll(itemDetail);
+
+            // Add the pending order to the list
+            catalogue.add(getCatalogue);
         }
 
         return catalogue;
+    }
+
+    @Override
+    public boolean isOutOfStock(String vendorId, String category, String subcategory, String itemId) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+
+        // Reference to the subcategory document
+        DocumentReference subcategoryRef = dbFirestore.collection(LIST_COLLECTION_NAME)
+                .document(vendorId)
+                .collection(category)
+                .document(subcategory);
+
+        // Fetch the subcategory document
+        ApiFuture<DocumentSnapshot> subcategorySnapshot = subcategoryRef.get();
+
+        // Get the item details (if document exists)
+        DocumentSnapshot subcategoryDoc = subcategorySnapshot.get();
+        if (subcategoryDoc.exists()) {
+            Map<String, Object> itemsMap = subcategoryDoc.getData();
+            if (itemsMap != null && itemsMap.containsKey(itemId)) {
+                Map<String, Object> itemDetails = (Map<String, Object>) itemsMap.get(itemId);
+                if (itemDetails != null) {
+                    // Check for "outOfStock" field and return its value (assuming boolean)
+                    return (boolean) itemDetails.getOrDefault("outOfStock", false); // return false if "outOfStock" is missing
+                }
+            }
+        }
+
+        // Item not found or document doesn't exist, consider it in stock (can be customized)
+        return false;
     }
 
     //delete product of outOfStock ----------------------------------------

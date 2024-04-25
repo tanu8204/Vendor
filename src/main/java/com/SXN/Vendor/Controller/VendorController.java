@@ -32,6 +32,8 @@ public class VendorController {
     // checked -------version , location , onboarding ?
     //http://localhost:8085/api/VendorList/registration?vendorId=vendor1&vendorName=ExampleVendor&gst_No=1234567890&address=ExampleAddress&phoneNumber=1234567890&regNo=ABC123&isActive=1&latitude=37.7749&longitude=-122.4194
     // https://vendor-npp2.onrender.com/api/VendorList/registration?vendorId=vendor1&vendorName=ExampleVendor&gst_No=1234567890&address=ExampleAddress&phoneNumber=1234567890&regNo=ABC123&onboarding=2024-04-07&isActive=1&latitude=37.7749&longitude=-122.4194
+    //dudes----
+    //http://localhost:8085/api/VendorList/registration?vendorId=vendor1&vendorName=ExampleVendor&gst_No=1234567890&address=ExampleAddress&phoneNumber=123456789&regNo=ABC123&isActive=1&latitude=37.7749&longitude=-122.4194
     @PostMapping("registration")
     public ResponseEntity<ApiResponse<VendorIdDetails>> registerVendor(
             @RequestParam(required = false) String vendorId,
@@ -171,6 +173,8 @@ public class VendorController {
 
     //Login-------------------------------------------[type? ]
     //http://localhost:8085/api/VendorList/logIn?phoneNumber=1234567890   checked
+    // dudes
+    //http://localhost:8085/api/VendorList/logIn?phoneNumber=123456789
     @GetMapping("/logIn")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getlogin(String phoneNumber) {
         try {
@@ -184,7 +188,7 @@ public class VendorController {
 
     // updateProfile -------------------------- incorrect
     //http://localhost:8085/api/VendorList/updateProfile?vendorId=vendor&phoneNumber=1233
-    @PutMapping("updateProfile")
+    @PostMapping("updateProfile")
     public ResponseEntity<Map<String, Object>> updateProfile(
             @RequestParam String vendorId,
             @RequestParam(required = false) String vendorName,

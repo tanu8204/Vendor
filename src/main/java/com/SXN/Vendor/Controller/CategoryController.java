@@ -178,7 +178,7 @@ public class CategoryController {
 
     //update Products -----------------------------------
     //http://localhost:8085/api/VendorList/updateItem?outOfStock=false&name=SilkSaree&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&itemId=w12&vendorId=vendor&lockinPeriod=15&S=11&L=23&XL=3&XXL=0&M=1&subcategory=Sarees&Category=Womenswear
-
+    //https://vendor-wbgq.onrender.com/api/VendorList/updateItem?outOfStock=false&name=SilkSaree&description=demo1&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&itemId=w12&vendorId=vendor1&lockinPeriod=15&S=11&L=23&XL=3&XXL=0&M=1&subcategory=Sarees&Category=Womenswear
     @PostMapping("updateItem")
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateItem(
             @RequestParam String vendorId,
@@ -272,6 +272,7 @@ public class CategoryController {
                     .body(ResponseUtils.createErrorResponse("Failed to fetch item details: " + e.getMessage()));
         }
     }
+
 
 
 

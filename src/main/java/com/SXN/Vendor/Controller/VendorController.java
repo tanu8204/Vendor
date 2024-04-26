@@ -4,7 +4,6 @@ import com.SXN.Vendor.Entity.VendorIdDetails;
 import com.SXN.Vendor.ResponseUtils.ApiResponse;
 import com.SXN.Vendor.ResponseUtils.ResponseUtils;
 import com.SXN.Vendor.Service.VendorService;
-import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 
@@ -93,10 +91,11 @@ public class VendorController {
 
     //http://localhost:8085/api/VendorList/LogIn?phoneNumber=01010100&type=IOS
     //http://localhost:8085/api/VendorList/LogIn?phoneNumber=01010100&type=Android
+    //https://vendor-wbgq.onrender.com/api/VendorList/LogIn?phoneNumber=01010100&type=Android
     @GetMapping("LogIn")
     public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestParam String phoneNumber,
-                                                                  @RequestParam String type,
-                                                                  @RequestParam(required = false) String vendorId) throws Exception {
+                                                                  @RequestParam String type
+                                                                  ) throws Exception {
         try {
             // Retrieve vendor details based on phoneNumber
             VendorIdDetails vendorDetails = vendorService.login(phoneNumber, type);
@@ -196,7 +195,7 @@ public class VendorController {
 
     // updateProfile --------------------------
     //http://localhost:8085/api/VendorList/updateProfile?vendorId=vendor&phoneNumber=1233&vendorName=Tannu&latitude=11.11&longitude=11.11&address=abca
-
+    //https://vendor-wbgq.onrender.com/api/VendorList/updateProfile?vendorId=vendor&phoneNumber=1233&vendorName=Tannu&latitude=11.11&longitude=11.11&address=abca
     @PostMapping("updateProfile")
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateProfile(
             @RequestParam String vendorId,
@@ -224,6 +223,34 @@ public class VendorController {
             // Return an appropriate error response
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ResponseUtils.createErrorResponse(("Invalid request or error updating profile.")));
+        }
+    }
+
+    //http://localhost:8085/api/VendorList/updateversion?vendorId=vendor1&type=IOS
+    @PostMapping("updateversion")
+    public ApiResponse updateVendorVersion(@RequestParam String vendorId,
+                                           @RequestParam String type) throws Exception {
+
+        if(vendorId==null || vendorId.isEmpty()){
+            throw new IllegalArgumentException("vendorId cannot be null or empty");
+        }
+        if(type==null || type.isEmpty()){
+            throw new IllegalArgumentException("type cannot be null or empty");
+        }
+        try {
+            vendorService.updateVendorVersion(vendorId, type);
+            ApiResponse response = new ApiResponse();
+            response.setStatus("No Content");
+            response.setStatusCode(204);
+            response.setMessage(type + " Version is updated");
+            // No data to return, use ResponseEntity.noContent().build()
+            return response;
+        }catch (Exception e){
+            log.error("Error updating vendor version for vendorId: {} and type: {}", vendorId, type, e);
+            // Consider returning a more informative error response (optional)
+            // You can create a custom error response class with details like message and error code
+            // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw e;
         }
     }
 

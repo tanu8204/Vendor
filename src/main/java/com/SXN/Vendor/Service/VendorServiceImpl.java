@@ -166,64 +166,6 @@ public class VendorServiceImpl implements VendorService {
     }
 
 
-
-    //updateProfile------------------------------------
-//    @Override
-//    public VendorIdDetails updateProfile(String vendorId, String vendorName, String phoneNo, Map<String, Double> location, String address) {
-//        Firestore dbFirestore = FirestoreClient.getFirestore();
-//
-//        // Retrieve vendor document reference
-//        DocumentReference vendorDocRef = dbFirestore.collection(LIST_COLLECTION_NAME)
-//                .document(vendorId);
-//
-//        // Get the existing vendor details
-//        ApiFuture<DocumentSnapshot> future = vendorDocRef.get();
-//        DocumentSnapshot document;
-//        try {
-//            document = future.get();
-//            if (document.exists()) {
-//                // Get the existing vendor details
-//                Map<String, Object> existingVendor = document.getData();
-//
-//                // Update the fields if they are not null
-//                if (vendorName != null) {
-//                    existingVendor.put("vendorName", vendorName);
-//                }
-//                if (phoneNo != null) {
-//                    existingVendor.put("phoneNumber", phoneNo);
-//                }
-//                if (location != null) {
-//                    existingVendor.put("location", location);
-//                }
-//                if (address != null) {
-//                    existingVendor.put("address", address);
-//                }
-//
-//                // Perform the update
-//                ApiFuture<WriteResult> updateResult = vendorDocRef.set(existingVendor, SetOptions.merge());
-//
-//                // Block on the result of the update operation
-//                updateResult.get();
-//                System.out.println("Profile updated successfully.");
-//
-//                // Return the updated profile
-//                VendorIdDetails updatedProfile = new VendorIdDetails();
-//                updatedProfile.setVendorId(vendorId);
-//                updatedProfile.setVendorName(vendorName != null ? vendorName : (String) existingVendor.get("vendorName"));
-//                updatedProfile.setPhoneNumber(phoneNo != null ? phoneNo : (String) existingVendor.get("phoneNumber"));
-//                updatedProfile.setLocation(location != null ? location : (Map<String, Double>) existingVendor.get("location"));
-//                updatedProfile.setAddress(address != null ? address : (String) existingVendor.get("address"));
-//
-//                return updatedProfile;
-//            } else {
-//                System.err.println("Vendor document not found.");
-//                return null;
-//            }
-//        } catch (InterruptedException | ExecutionException e) {
-//            System.err.println("Error updating profile: " + e.getMessage());
-//            return null;
-//        }
-//    }
     @Override
     public Map<String, Object> updateProfile(String vendorId, String vendorName, String phoneNumber, Map<String, Double> location, String address) {
         Firestore dbFirestore = FirestoreClient.getFirestore();
@@ -264,5 +206,60 @@ public class VendorServiceImpl implements VendorService {
         // Return only the updated fields
         return updates;
     }
+
+    @Override
+    public void updateVendorVersion(String vendorId, String type) throws Exception {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+
+        // 1. Retrieve Vendor Details (Optional)
+        // If you need to update other fields in the vendor document, uncomment this block:
+    /*
+    DocumentReference vendorRef = dbFirestore.collection(LIST_COLLECTION_NAME)
+            .document(vendorId);
+    DocumentSnapshot vendorSnapshot = vendorRef.get().get();
+
+    if (vendorSnapshot.exists()) {
+        VendorIdDetails vendor = vendorSnapshot.toObject(VendorIdDetails.class);
+        // Update other fields in vendor object if needed
+    } else {
+        log.info("Vendor with ID {} not found", vendorId);
+        return;  // Handle case where vendor doesn't exist
+    }
+    */
+
+        // 2. Update Version based on type
+        DocumentReference versionRef = null;
+        if (type.equalsIgnoreCase("Android")) {
+            versionRef = dbFirestore.collection("Version").document("Android Version");
+        } else if (type.equalsIgnoreCase("IOS")) {
+            versionRef = dbFirestore.collection("Version").document("IOS Version");
+        } else {
+            throw new IllegalArgumentException("Invalid vendor type: " + type);
+        }
+
+        ApiFuture<DocumentSnapshot> versionFuture = versionRef.get();
+        Map<String, Object> versionData = versionFuture.get().getData();
+
+        if (versionData != null) {
+            if (versionData.containsKey("version")) {
+                String latestVersion = versionData.get("version").toString();
+
+                // 3. Update Vendor Document with retrieved version
+                Map<String, Object> updateData = Collections.singletonMap(
+                        "vendor" + type + "Version", latestVersion);
+                dbFirestore.collection(LIST_COLLECTION_NAME)
+                        .document(vendorId)
+                        .update(updateData);
+
+                log.info("Vendor {} {} version updated to {}", vendorId, type, latestVersion);
+            } else {
+                log.info("Version field not found in {} document", type);
+            }
+        } else {
+            log.info("{} Version document not found", type);
+        }
+    }
+
+
 
 }

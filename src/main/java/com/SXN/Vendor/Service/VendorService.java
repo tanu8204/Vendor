@@ -13,4 +13,6 @@ public interface VendorService {
     Map<String, Object> checkRegistration(String phoneNumber) throws ExecutionException, InterruptedException;
 
     Map<String, Object> updateProfile(String vendorId, String vendorName, String phoneNo, Map<String, Double> location, String address);
+
+    void updateVendorVersion(String vendorId, String type) throws Exception;
 }

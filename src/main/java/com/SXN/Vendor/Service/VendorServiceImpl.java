@@ -30,6 +30,32 @@ public class VendorServiceImpl implements VendorService {
         ApiFuture<WriteResult> collectionApiFuture = dbFirestore.collection(LIST_COLLECTION_NAME)
                 .document(vendor.getVendorId().toString()) // Use vendor ID as document ID
                 .set(vendor);
+        //Android Version
+        ApiFuture<DocumentSnapshot> androidVersionFuture = dbFirestore.collection("Version")
+                .document("Android Version").get();
+        Map<String, Object> androidVersionData = androidVersionFuture.get().getData();
+
+        if (androidVersionData != null) {
+            log.info("Retrieved Android version data: {}", androidVersionData);  // Add logging
+            if (androidVersionData.containsKey("version")) {
+                vendor.setVendorAndroidVersion(androidVersionData.get("version").toString());
+            }
+        } else {
+            log.info("Failed to retrieve Android version data");  // Add logging
+        }
+        //IOS
+        ApiFuture<DocumentSnapshot> iosVersionFuture = dbFirestore.collection("Version")
+                .document("IOS Version").get();
+        Map<String, Object> iosVersionData = iosVersionFuture.get().getData();
+
+        if (iosVersionData != null) {
+            log.info("Retrieved Android version data: {}", iosVersionData);  // Add logging
+            if (iosVersionData.containsKey("version")) {
+                vendor.setVendorIOSVersion(iosVersionData.get("version").toString());
+            }
+        } else {
+            log.info("Failed to retrieve IOS version data");  // Add logging
+        }
         Map<String, Object> savedData = saveVendorDetails();
 
         return collectionApiFuture.get().getUpdateTime().toString();
@@ -82,42 +108,42 @@ public class VendorServiceImpl implements VendorService {
         }
     }
 
-//    //login -----------------------------------------------------------
-//    @Override
-//    public VendorIdDetails login(String phoneNumber, String type , String vendorId) throws ExecutionException, InterruptedException {
-//        Firestore dbFirestore = FirestoreClient.getFirestore();
-//
-//        // Query to find the document where phoneNumber field matches the provided value
-//        Query query = dbFirestore.collection(LIST_COLLECTION_NAME).whereEqualTo("phoneNumber", phoneNumber);
-//
-//        // Execute the query
-//        ApiFuture<QuerySnapshot> querySnapshot = query.get();
-//
-//        // Get the documents from the query result
-//        QuerySnapshot documentSnapshots = querySnapshot.get();
-//
-//        // Check if any documents match the query
-//        if (!documentSnapshots.isEmpty()) {
-//            // Retrieve the first document (assuming phoneNumber is unique)
-//            DocumentSnapshot document = documentSnapshots.getDocuments().get(0);
-//
-//            // Convert the document to a VendorIdDetails object
-//            VendorIdDetails vendor = document.toObject(VendorIdDetails.class);
-//
-//            // Log and return the retrieved vendor details
-//            log.debug("Retrieved vendor details by phoneNumber {}: {}", phoneNumber, vendor);
-//            return vendor;
-//        } else {
-//            // Log and return null if no document matches the phoneNumber
-//            log.info("Vendor with phoneNumber {} does not exist", phoneNumber);
-//            return null;
-//        }
-//    }
+    //login -----------------------------------------------------------
+    @Override
+    public VendorIdDetails login(String phoneNumber, String type) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+
+        // Query to find the document where phoneNumber field matches the provided value
+        Query query = dbFirestore.collection(LIST_COLLECTION_NAME).whereEqualTo("phno", phoneNumber);
+
+        // Execute the query
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+
+        // Get the documents from the query result
+        QuerySnapshot documentSnapshots = querySnapshot.get();
+
+        // Check if any documents match the query
+        if (!documentSnapshots.isEmpty()) {
+            // Retrieve the first document (assuming phoneNumber is unique)
+            DocumentSnapshot document = documentSnapshots.getDocuments().get(0);
+
+            // Convert the document to a VendorIdDetails object
+            VendorIdDetails vendor = document.toObject(VendorIdDetails.class);
+
+            // Log and return the retrieved vendor details
+            log.debug("Retrieved vendor details by phoneNumber {}: {}", phoneNumber, vendor);
+            return vendor;
+        } else {
+            // Log and return null if no document matches the phoneNumber
+            log.info("Vendor with phoneNumber {} does not exist", phoneNumber);
+            return null;
+        }
+    }
 
 
     //Login ---------------------------------------[type]
     @Override
-    public Map<String, Object> login(String phoneNumber) throws ExecutionException, InterruptedException {
+    public Map<String, Object> checkRegistration(String phoneNumber) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
 
         // Create a query to find documents where the phone number matches
@@ -208,6 +234,7 @@ public class VendorServiceImpl implements VendorService {
         // Create a map to hold the updated fields
         Map<String, Object> updates = new HashMap<>();
 
+
         // Add the fields to update, if they are not null
         if (vendorName != null) {
             updates.put("vendorName", vendorName);
@@ -215,7 +242,8 @@ public class VendorServiceImpl implements VendorService {
         if (phoneNumber != null) {
             updates.put("phoneNumber", phoneNumber);
         }
-        if (location != null) {
+        // Only add location if it has values
+        if (location != null && !location.isEmpty()) {
             updates.put("location", location);
         }
         if (address != null) {

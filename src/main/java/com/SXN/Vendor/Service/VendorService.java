@@ -8,8 +8,9 @@ import java.util.concurrent.ExecutionException;
 public interface VendorService {
     String saveVendor(VendorIdDetails vendor) throws ExecutionException, InterruptedException;
 
-    //vendors name geo location and vendors document ---------------------------------------
-    Map<String, Object> login(String phoneNumber) throws ExecutionException, InterruptedException;
+    VendorIdDetails login(String phoneNumber, String type) throws ExecutionException, InterruptedException;
+
+    Map<String, Object> checkRegistration(String phoneNumber) throws ExecutionException, InterruptedException;
 
     Map<String, Object> updateProfile(String vendorId, String vendorName, String phoneNo, Map<String, Double> location, String address);
 }

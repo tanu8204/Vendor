@@ -6,9 +6,7 @@ import com.SXN.Vendor.ResponseUtils.ResponseUtils;
 import com.SXN.Vendor.Service.VendorService;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 
@@ -31,9 +31,9 @@ public class VendorController {
 
     // checked -------version , location , onboarding ?
     //http://localhost:8085/api/VendorList/registration?vendorId=vendor1&vendorName=ExampleVendor&gst_No=1234567890&address=ExampleAddress&phoneNumber=1234567890&regNo=ABC123&isActive=1&latitude=37.7749&longitude=-122.4194
-    // https://vendor-npp2.onrender.com/api/VendorList/registration?vendorId=vendor1&vendorName=ExampleVendor&gst_No=1234567890&address=ExampleAddress&phoneNumber=1234567890&regNo=ABC123&onboarding=2024-04-07&isActive=1&latitude=37.7749&longitude=-122.4194
     //dudes----
     //http://localhost:8085/api/VendorList/registration?vendorId=vendor1&vendorName=ExampleVendor&gst_No=1234567890&address=ExampleAddress&phoneNumber=123456789&regNo=ABC123&isActive=1&latitude=37.7749&longitude=-122.4194
+    //https://vendor-wbgq.onrender.com/api/VendorList/registration?vendorId=vendor1&vendorName=ExampleVendor&gst_No=1234567890&address=ExampleAddress&phoneNumber=123456789&regNo=ABC123&isActive=1&latitude=37.7749&longitude=-122.4194
     @PostMapping("registration")
     public ResponseEntity<ApiResponse<VendorIdDetails>> registerVendor(
             @RequestParam(required = false) String vendorId,
@@ -47,7 +47,7 @@ public class VendorController {
             @RequestParam(required = false) String longitude) {
         try {
             // Check if vendor with the provided phone number already exists
-            Map<String, Object> existingVendor = vendorService.login(phoneNumber);
+            Map<String, Object> existingVendor = vendorService.checkRegistration(phoneNumber);
             if (existingVendor != null) {
                 // Vendor with the same phone number already exists
                 return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -91,105 +91,114 @@ public class VendorController {
     }
 
 
-
-    //http://localhost:8085/api/VendorList/LogIn?vendorId=vendor1
-    //https://vendor-npp2.onrender.com/api/VendorList/LogIn?vendorId=vendor1
-//    @GetMapping("LogIn")
-//    public ResponseEntity<ApiResponse<VendorIdDetails>> login(@RequestParam String phoneNumber,
-//                                                                         @RequestParam String type,
-//                                                                         @RequestParam(required = false) String vendorId) {
-//        try {
-//            // Check if the provided type is compatible with the latest version
-//            if (!isStable(phoneNumber,type, vendorId)) {
-//                log.info("Incompatible device type: {}", type);
-//                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                        .body(ResponseUtils.createErrorResponse("Incompatible device type"));
-//            }
-//
-//            // Retrieve vendor details based on the phoneNumber
-//            VendorIdDetails vendorDetails = vendorService.login(phoneNumber, type, vendorId);
-//
-//            // If vendor details not found for the provided phoneNumber
-//            if (vendorDetails == null) {
-//                log.info("PhoneNumber not found: {}", phoneNumber);
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                        .body(ResponseUtils.createErrorResponse("Vendor not found"));
-//            }
-//
-//            log.info("Retrieved vendor details for phoneNumber: {}", phoneNumber);
-//            ApiResponse<VendorIdDetails> response = ResponseUtils.createOkResponse(vendorDetails);
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            log.error("Error retrieving vendor details: {}", e.getMessage(), e);
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body(ResponseUtils.createErrorResponse("Type variable is missing or incorrect"));
-//        }
-//    }
-//
-//    private boolean isStable(String phoneNumber, String type, String vendorId) throws ExecutionException, InterruptedException {
-//        // Retrieve the latest version from the appropriate document based on type (android/ios)
-//        Firestore dbFirestore = FirestoreClient.getFirestore();
-//
-//        DocumentReference versionDocRef = dbFirestore.collection("Version").document(type + " Version");
-//        ApiFuture<DocumentSnapshot> future = versionDocRef.get();
-//        DocumentSnapshot document = future.get();
-//
-//        if (document.exists()) {
-//            // Get the version from the document
-//            String latestVersion = document.getString("version");
-//            log.info("Latest version for {} is {}", type, latestVersion);
-//
-//            // Retrieve the vendor details based on vendorId
-//            VendorIdDetails vendorDetails = vendorService.login(phoneNumber, type, vendorId);
-//            log.info("Retrieved vendor details for vendorId: {}", vendorId);
-//
-//            // Check if the vendorDetails object is null
-//            if (vendorDetails == null) {
-//                log.info("Vendor details not found for vendorId: {}", vendorId);
-//                return false; // Handle null vendorDetails appropriately
-//            }
-//
-//            if (type.equalsIgnoreCase("Android")) {
-//                // Check if the vendor's Android version is the latest version
-//                String vendorAndroidVersion = vendorDetails.getVendorAndroidVersion();
-//                log.info("Vendor Android version: {}", vendorAndroidVersion);
-//                return latestVersion.equals(vendorAndroidVersion);
-//            } else if (type.equalsIgnoreCase("IOS")) {
-//                // Check if the vendor's iOS version is the latest version
-//                String vendorIOSVersion = vendorDetails.getVendorIOSVersion();
-//                log.info("Vendor iOS version: {}", vendorIOSVersion);
-//                return latestVersion.equals(vendorIOSVersion);
-//            } else {
-//                // If type is neither android nor ios, return false
-//                log.info("Invalid device type: {}", type);
-//                return false;
-//            }
-//        } else {
-//            // If the document doesn't exist, return false
-//            log.info("Document does not exist for {} Version", type);
-//            return false;
-//        }
-//    }
-
-    //Login-------------------------------------------[type? ]
-    //http://localhost:8085/api/VendorList/logIn?phoneNumber=1234567890   checked
-    // dudes
-    //http://localhost:8085/api/VendorList/logIn?phoneNumber=123456789
-    @GetMapping("/logIn")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> getlogin(String phoneNumber) {
+    //http://localhost:8085/api/VendorList/LogIn?phoneNumber=01010100&type=IOS
+    //http://localhost:8085/api/VendorList/LogIn?phoneNumber=01010100&type=Android
+    @GetMapping("LogIn")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestParam String phoneNumber,
+                                                                  @RequestParam String type,
+                                                                  @RequestParam(required = false) String vendorId) throws Exception {
         try {
-            Map<String, Object> vendorDetails = vendorService.login(phoneNumber);
-            return ResponseEntity.ok(ResponseUtils.createOkResponse(vendorDetails));
-        } catch (ExecutionException | InterruptedException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ResponseUtils.createErrorResponse("Error retrieving vendor details: " + e.getMessage()));
+            // Retrieve vendor details based on phoneNumber
+            VendorIdDetails vendorDetails = vendorService.login(phoneNumber, type);
+
+            if (vendorDetails == null) {
+                log.info("Vendor with phoneNumber {} does not exist", phoneNumber);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ResponseUtils.createErrorResponse("Vendor not found"));
+            }
+
+            // Check compatibility using a separate method (optional)
+            boolean isStable = isStable(phoneNumber, type);
+
+            // Create a Map to hold vendor details and isStable flag
+            Map<String, Object> responseMap = new HashMap<>();
+
+            // Option 1 (Using Lombok - if available):
+            // Assuming @Data annotation is added to VendorIdDetails class
+            // responseMap.putAll(vendorDetails);
+
+            // Option 2 (Manual Property Copying - if not using Lombok):
+            for (Field field : vendorDetails.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                try {
+                    responseMap.put(field.getName(), field.get(vendorDetails));
+                } catch (IllegalAccessException e) {
+                    log.error("Error copying property: {}", field.getName(), e);
+                    // Handle access exception (optional)
+                }
+            }
+
+            responseMap.put("isStable", isStable);
+
+            // Create the response with the map
+            ApiResponse<Map<String, Object>> response = ResponseUtils.createOkResponse(responseMap);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error retrieving vendor details: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ResponseUtils.createErrorResponse("Internal server error"));
         }
     }
 
-    // updateProfile -------------------------- incorrect
-    //http://localhost:8085/api/VendorList/updateProfile?vendorId=vendor&phoneNumber=1233
+
+    private boolean isStable(String phoneNumber, String type) throws Exception {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+
+        try {
+            // Get the version document reference
+            DocumentReference versionDocRef = dbFirestore.collection("Version").document(type + " Version");
+
+            // Get the document (blocking operation)
+            DocumentSnapshot document = versionDocRef.get().get();
+
+            if (document.exists()) {
+                // Get the latest version from the document
+                String latestVersion = document.getString("version");
+                log.info("Latest version for {} is {}", type, latestVersion);
+
+                // Retrieve the vendor details based on vendorId
+                VendorIdDetails vendorDetails = vendorService.login(phoneNumber, type);
+                String existingVersion = null;
+                if (type.equalsIgnoreCase("Android")) {
+                    existingVersion = vendorDetails.getVendorAndroidVersion();
+                    if (!latestVersion.equals(existingVersion)) {
+                        log.info("Need to update the Android version ");
+                        return false; // Vendor is not stable (version mismatch)
+                    }
+                } else if (type.equalsIgnoreCase("IOS")) {
+                    existingVersion = vendorDetails.getVendorIOSVersion();
+                    if (!latestVersion.equals(existingVersion)) {
+                        log.info("Need to update the IOS version ");
+                        return false; // Vendor is not stable (version mismatch)
+                    }
+                }
+
+                // Check if the vendor version is null
+                if (existingVersion == null) {
+                    log.info("Vendor version not found for vendorId");
+                    // Handle missing version appropriately (e.g., return false or specific error)
+                    return false;
+                }
+
+                // If versions match, vendor is considered stable
+                return true;
+            } else {
+                // If the document doesn't exist, consider returning a specific error
+                log.info("Document does not exist for {} Version", type);
+                return false; // Consider unstable due to missing version info
+            }
+        } catch (Exception e) {
+            log.error("Error retrieving version from Firestore: {}", e.getMessage(), e);
+            // Handle Firestore related errors (e.g., return false or specific error)
+            return false;
+        }
+    }
+
+    // updateProfile --------------------------
+    //http://localhost:8085/api/VendorList/updateProfile?vendorId=vendor&phoneNumber=1233&vendorName=Tannu&latitude=11.11&longitude=11.11&address=abca
+
     @PostMapping("updateProfile")
-    public ResponseEntity<Map<String, Object>> updateProfile(
+    public ResponseEntity<ApiResponse<Map<String, Object>>> updateProfile(
             @RequestParam String vendorId,
             @RequestParam(required = false) String vendorName,
             @RequestParam(required = false) String phoneNumber,
@@ -203,17 +212,19 @@ public class VendorController {
                 location.put("latitude", latitude);
                 location.put("longitude", longitude);
             }
+
             // Update the profile and get the updated fields
             Map<String, Object> updatedFields = vendorService.updateProfile(vendorId, vendorName, phoneNumber, location,address);
 
             // Return only the updated fields in JSON format
-            return ResponseEntity.ok(updatedFields);
+            return ResponseEntity.ok(ResponseUtils.createOkResponse(updatedFields));
         } catch (Exception e) {
-            // Log the exception
-            e.printStackTrace();
+            // Log the exception details using a logging library
+            log.error("Error occurred while updating profile: " + e.getMessage(), e);
             // Return an appropriate error response
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "Failed to update profile. Please try again later."));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ResponseUtils.createErrorResponse(("Invalid request or error updating profile.")));
         }
     }
+
 }

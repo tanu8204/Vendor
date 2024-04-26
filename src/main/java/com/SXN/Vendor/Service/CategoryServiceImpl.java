@@ -242,49 +242,6 @@ public class CategoryServiceImpl implements CategoryService{
         }
     }
 
-    //update products -------------------------------------
-
-    @Override
-    public Map<String, Object> updateItem(String vendorId, String Category, String subcategory, String itemId, String name, String description,
-                                          List<String> pictures, Integer price, Map<String, Integer> size) {
-        Firestore dbFirestore = FirestoreClient.getFirestore();
-
-        try {
-            // Construct a map containing the fields to update
-            Map<String, Object> updateData = new HashMap<>();
-            if (name != null) updateData.put("Name", description);
-            if (description != null) updateData.put("Description", description);
-            if (pictures != null) updateData.put("Images", pictures);
-            if (price != null) updateData.put("Price", price);
-            if (size != null) updateData.put("Size", size);
-
-            // Update the item in Catalogue collection
-            DocumentReference catalogueRef = dbFirestore.collection(LIST_COLLECTION_NAME)
-                    .document(vendorId)
-                    .collection("Catalogue")
-                    .document(itemId);
-            catalogueRef.set(updateData, SetOptions.merge());
-
-            // Update the item in the subcategory collection
-            DocumentReference subcategoryRef = dbFirestore.collection(LIST_COLLECTION_NAME)
-                    .document(vendorId)
-                    .collection(Category)
-                    .document(subcategory);
-            subcategoryRef.update(itemId, updateData);
-
-            // Update the item in the corresponding subcategory collection
-            DocumentReference collectionRef = dbFirestore.collection(subcategory)
-                            .document(itemId);
-            collectionRef.update(updateData);
-
-            return updateData;
-        } catch (Exception e) {
-            System.out.println("Error occurred: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @Override
     public List<Map<String, Object>> getPending(String vendorId) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();

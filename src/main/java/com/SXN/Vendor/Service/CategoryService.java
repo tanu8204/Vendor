@@ -21,8 +21,6 @@ public interface CategoryService {
 
     void deleteOutOfStockItems(String vendorId, String Category, String subcategory, String itemId) throws ExecutionException, InterruptedException;
 
-    Map<String, Object> updateItem(String vendorId, String Category, String subcategory, String itemId, String name, String description,
-                                   List<String> pictures, Integer price, Map<String, Integer> size);
 
     List<Map<String, Object>> getPending(String vendorId) throws ExecutionException, InterruptedException;
 

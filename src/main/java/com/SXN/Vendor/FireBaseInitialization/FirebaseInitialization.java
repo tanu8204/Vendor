@@ -15,14 +15,14 @@ import java.io.IOException;
 @Configuration
 public class FirebaseInitialization {
 
-    @Value("${SECRET_FILE_PATH:/etc/secrets/KEY}")
-    private String credentialPath;
+//    @Value("${SECRET_FILE_PATH:/etc/secrets/KEY}")
+//    private String credentialPath;
     @PostConstruct
     public void initialization() {
         FileInputStream serviceAccount = null;
         try {
-           // serviceAccount = new FileInputStream("./serviceAccountKey.json");
-            serviceAccount = new FileInputStream(credentialPath);
+           serviceAccount = new FileInputStream("./serviceAccountKey.json");
+          //  serviceAccount = new FileInputStream(credentialPath);
 
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))

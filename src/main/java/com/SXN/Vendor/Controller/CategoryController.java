@@ -26,6 +26,7 @@ public class CategoryController {
    //http://localhost:8085/api/VendorList/addMenswear?outOfStock=false&name=T-shirt&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&itemId=12&vendorId=vendor&lockinPeriod=15&S=10&L=23&XL=3&XXL=0&M=1&subcategory=Kurtas&Category=Menswear
    //dudes
     //http://localhost:8085/api/VendorList/addMenswear?outOfStock=false&name=T-shirt&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&itemId=12&vendorId=vendor1&lockinPeriod=15&S=10&L=23&XL=3&XXL=0&M=1&subcategory=Shirts&Category=Menswear
+    //https://vendor-wbgq.onrender.com/api/VendorList/addMenswear?outOfStock=false&name=T-shirt&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&itemId=MS123&vendorId=vendor1&lockinPeriod=15&S=10&L=23&XL=3&XXL=0&M=1&subcategory=Shirts&Category=Menswear
     @PostMapping("addMenswear")
     public ResponseEntity<ApiResponse<Map<String, Object>>> saveMensDetails(
             @RequestParam String vendorId,
@@ -44,16 +45,8 @@ public class CategoryController {
             @RequestParam(required = false) int XXL,
             @RequestParam int lockinPeriod) {
         try {
-            // Convert lockinStart String to Timestamp
-          /*  SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-            Date startDate = dateFormat.parse(lockinStart);
-             com.google.cloud.Timestamp startTimestamp = com.google.cloud.Timestamp.of(startDate);
 
-*/
             Timestamp currentTimestamp = Timestamp.ofTimeMicroseconds(Instant.now().getEpochSecond());
-
-
-            // Convert Date to com.google.cloud.Timestamp
 
             Map<String, Integer> size = new HashMap<>();
             size.put("S", S);
@@ -70,6 +63,7 @@ public class CategoryController {
         }
     }
     //http://localhost:8085/api/VendorList/addWomenswear?outOfStock=false&name=SilkSaree&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&itemId=w12&vendorId=vendor&lockinPeriod=15&S=10&L=23&XL=3&XXL=0&M=1&subcategory=Sarees&Category=Womenswear
+    //https://vendor-wbgq.onrender.com/api/VendorList/addMenswear?outOfStock=false&name=Cotton Saree&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&itemId=W123&vendorId=vendor1&lockinPeriod=15&S=10&L=23&XL=3&XXL=0&M=1&subcategory=Sarees&Category=Womenswear
     @PostMapping("addWomenswear")
     public ResponseEntity<ApiResponse<Map<String, Object>>> saveWomensDetails(
             @RequestParam String vendorId,
@@ -107,6 +101,7 @@ public class CategoryController {
     }
 
     //http://localhost:8085/api/VendorList/addKidswear?outOfStock=false&name=kido&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&vendorId=vendor&lockinPeriod=15&S=10&L=23&XL=3&XXL=0&M=1&Category=Kidswear&itemId=k01&subcategory=Boy
+    //https://vendor-wbgq.onrender.com/api/VendorList/addKidswear?outOfStock=false&name=kido&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&vendorId=vendor1&lockinPeriod=15&S=10&L=23&XL=3&XXL=0&M=1&Category=Kidswear&itemId=k01&subcategory=Boy
     @PostMapping("addKidswear")
     public ResponseEntity<ApiResponse<Map<String, Object>>> saveKidsDetails(
             @RequestParam String vendorId,
@@ -142,7 +137,7 @@ public class CategoryController {
         }
     }
     //checked----
-    //https://vendor-1-vfyh.onrender.com/api/VendorList/getcatalogue?vendorId=vendor1
+    //https://vendor-wbgq.onrender.com/api/VendorList/getcatalogue?vendorId=vendor1
     //http://localhost:8085/api/VendorList/getcatalogue?vendorId=vendor
     //dudes
     //http://localhost:8085/api/VendorList/getcatalogue?vendorId=vendor1
@@ -159,6 +154,7 @@ public class CategoryController {
 
     //delete product when stock == true ----------------------------checked
     //http://localhost:8085/api/VendorList/deleteOutOfStockItems?vendorId=vendor&Category=Womenswear&subcategory=Sarees&itemId=22
+    //https://vendor-wbgq.onrender.com/api/VendorList/deleteOutOfStockItems?vendorId=vendor1&Category=Kidswear&subcategory=Boy&itemId=tk11
     @PostMapping("deleteOutOfStockItems")
     public ResponseEntity<ApiResponse<String>> deleteOutOfStockItem(@RequestParam String vendorId,
                                                                     @RequestParam String Category,
@@ -180,24 +176,29 @@ public class CategoryController {
         }
     }
 
-    //update Products -----------------------------------error
-    //http://localhost:8085/api/VendorList/updateItem?vendorId=vendor&Category=Menswear&subcategory=Shirts&itemId=22&Description=12345qwert&price=0000&M=000&pictures=1,2
+    //update Products -----------------------------------
+    //http://localhost:8085/api/VendorList/updateItem?outOfStock=false&name=SilkSaree&description=demo&price=1234&pictures=link1,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f,https://firebasestorage.googleapis.com/v0/b/duds-68a6d.appspot.com/o/pic1.jpg?alt=media%26token=452ba8c3-928b-490e-87e6-d567419bbf5f&itemId=w12&vendorId=vendor&lockinPeriod=15&S=11&L=23&XL=3&XXL=0&M=1&subcategory=Sarees&Category=Womenswear
+
     @PostMapping("updateItem")
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateItem(
             @RequestParam String vendorId,
             @RequestParam String Category,
             @RequestParam String subcategory,
+            @RequestParam String name,
+            @RequestParam String description,
             @RequestParam String itemId,
-            @RequestParam (required = false) String name,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) List<String> pictures,
-            @RequestParam(required = false) int price,
-            @RequestParam(required = false) int  S,
+            @RequestParam List<String> pictures,
+            @RequestParam int price,
+            @RequestParam boolean outOfStock,
+            @RequestParam(required = false) int S,
             @RequestParam(required = false) int M,
             @RequestParam(required = false) int L,
             @RequestParam(required = false) int XL,
-            @RequestParam(required = false) int XXL) {
+            @RequestParam(required = false) int XXL,
+            @RequestParam int lockinPeriod) {
         try {
+
+            Timestamp currentTimestamp = Timestamp.ofTimeMicroseconds(Instant.now().getEpochSecond());
 
             Map<String, Integer> size = new HashMap<>();
             size.put("S", S);
@@ -205,18 +206,19 @@ public class CategoryController {
             size.put("L", L);
             size.put("XL", XL);
             size.put("XXL", XXL);
-            Map<String, Object> updateitem = categoryService.updateItem(vendorId, Category, subcategory, itemId, name, description, pictures, price, size);
-            return ResponseEntity.ok(ResponseUtils.createOkResponse(updateitem));
+
+            Map<String, Object> savedCategory = categoryService.saveCategoryDetails(vendorId,Category,subcategory,name,description, itemId, pictures, price, size, outOfStock, lockinPeriod);
+            return ResponseEntity.ok(ResponseUtils.createOkResponse(savedCategory));
         } catch (Exception e) {
-            // Log the exception
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ResponseUtils.createErrorResponse("Failed to update the item: " + e.getMessage()));
+                    .body(ResponseUtils.createErrorResponse("Failed to add category: " + e.getMessage()));
         }
     }
 
     //pending orders -------------------------------------
 
     //servicekey - duds ----checked
+    //https://vendor-wbgq.onrender.com/api/VendorList/pendingOrders?vendorId=QY7AhEbn2kZ9IWVPo7Il2wAsHZj1
     //http://localhost:8085/api/VendorList/pendingOrders?vendorId=QY7AhEbn2kZ9IWVPo7Il2wAsHZj1
     //http://localhost:8085/api/VendorList/pendingOrders?vendorId=vendor
     @GetMapping("pendingOrders")
@@ -231,6 +233,7 @@ public class CategoryController {
     }
 
     //service key - duds ---- checked
+    //https://vendor-wbgq.onrender.com/api/VendorList/completedOrders?vendorId=QY7AhEbn2kZ9IWVPo7Il2wAsHZj1
     //http://localhost:8085/api/VendorList/completedOrders?vendorId=QY7AhEbn2kZ9IWVPo7Il2wAsHZj1
     @GetMapping("completedOrders")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getcompletedOrders(@RequestParam String vendorId) {
@@ -247,6 +250,7 @@ public class CategoryController {
     //http://localhost:8085/api/VendorList/getitem?vendorId=vendor&itemId=w11
     //duds
     //http://localhost:8085/api/VendorList/getitem?vendorId=vendor1&itemId=tm22
+    //https://vendor-wbgq.onrender.com/api/VendorList/getitem?vendorId=vendor1&itemId=tm22
     @GetMapping("getitem")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getItemDetailsByVendorId(
             @RequestParam String vendorId,
